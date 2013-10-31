@@ -3,6 +3,7 @@
 #
 # J Paulo Barraca <jpbarraca@gmail.com>
 #
+# Test comment to test git
 from nrf24 import NRF24
 import time
 
