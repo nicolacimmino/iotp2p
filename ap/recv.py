@@ -6,7 +6,7 @@
 from nrf24 import NRF24
 import time
 
-pipes = [[0x32, 0x33, 0x34, 0x35, 0x36], [0x32, 0x33, 0x34, 0x35, 0x36]]
+pipes = [[0x70, 0x70, 0x70, 0x70, 0x71], [0x70, 0x70, 0x70, 0x70, 0x70]]
 
 radio = NRF24()
 
@@ -16,16 +16,18 @@ radio = NRF24()
 #  in the constructor of NRF24
 radio.begin(0, 0, 15, 18) 
 
-radio.setCRCLength(NRF24.CRC_DISABLED)
+radio.setCRCLength(NRF24.CRC_8)
 
 radio.setRetries(15,15)
 
-radio.setPayloadSize(16)
-radio.setChannel(0x02)
-radio.setDataRate(NRF24.BR_250KBPS)
+radio.setPayloadSize(4)
+radio.setChannel(0x0A)
+#radio.setDataRate(NRF24.BR_250KBPS)
+radio.setDataRate(NRF24.BR_2MBPS)
+
 radio.setPALevel(NRF24.PA_MAX)
 
-radio.setAutoAck(0) 
+radio.setAutoAck(1) 
 
 radio.openWritingPipe(pipes[0])
 radio.openReadingPipe(1, pipes[1])
@@ -36,7 +38,7 @@ radio.stopListening()
 radio.printDetails()
 
 
-#buf = [0x00, 0x00, 0x01, 'd', 'e', 'f', 'g', 'h', 'i', 'l', 'm', 'n', 'o', 'p', 'q', 'r']
+#buf = ['d', 'e', 'f', 'g']
 #while True:
 #    radio.write(buf)
 #    time.sleep(1)
@@ -47,13 +49,15 @@ radio.startListening()
 try:
  while True:
     pipe = [0]
-    while not radio.available(pipe, True): # Changed irq wait to False
+    while not radio.available(pipe, False): # Changed irq wait to False
         time.sleep(1000/1000000.0)
-    print "Available"
     recv_buffer = []
     radio.read(recv_buffer)
 
     print recv_buffer
+    radio.stopListening()
+    radio.write(recv_buffer)
+    radio.startListening()
 except KeyboardInterrupt:
  print "Terminating"
 finally:
