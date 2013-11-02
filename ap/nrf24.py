@@ -432,15 +432,15 @@ class NRF24:
         # Begin the write
         self.startWrite(buf)
 
-        timeout = self.getMaxTimeout() #ms to wait for timeout
+        timeout = self.getMaxTimeout()/1000 #ms to wait for timeout
         sent_at = int(round(time.time() * 1000))
 
-        while True:
-            status = self.read_register(NRF24.OBSERVE_TX, 1)
-            if (status & (_BV(NRF24.TX_DS) | _BV(NRF24.MAX_RT))) or (
-                int(round(time.time() * 1000) - sent_at > timeout) ):
-                break
-            time.sleep(10 / 1000000L)
+        #while True:
+        #    status = self.read_register(NRF24.OBSERVE_TX, 1)
+        #    if (status & (_BV(NRF24.TX_DS) | _BV(NRF24.MAX_RT))) or (
+        #        int(round(time.time() * 1000) - sent_at > timeout) ):
+        #      break
+	#    time.sleep(10 / 1000000L)
 
         what = self.whatHappened()
 
