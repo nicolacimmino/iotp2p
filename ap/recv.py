@@ -56,7 +56,9 @@ try:
 
     print recv_buffer
     radio.stopListening()
-    radio.write(recv_buffer)
+    time.sleep(0.01)
+    buf = ['d', 'e', 'f', 'g']
+    radio.write(buf)
     radio.startListening()
 except KeyboardInterrupt:
  print "Terminating"
