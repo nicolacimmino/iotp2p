@@ -17,16 +17,12 @@ radio = NRF24()
 radio.begin(0, 0, 15, 18) 
 
 radio.setCRCLength(NRF24.CRC_8)
-
 radio.setRetries(15,15)
-
 radio.setPayloadSize(4)
 radio.setChannel(0x0A)
-#radio.setDataRate(NRF24.BR_250KBPS)
-radio.setDataRate(NRF24.BR_2MBPS)
-
+radio.setDataRate(NRF24.BR_250KBPS)
+#radio.setDataRate(NRF24.BR_2MBPS)
 radio.setPALevel(NRF24.PA_MAX)
-
 radio.setAutoAck(1) 
 
 radio.openWritingPipe(pipes[0])
@@ -54,12 +50,12 @@ try:
     recv_buffer = []
     radio.read(recv_buffer)
 
-    print recv_buffer
+#    print recv_buffer
+#    time.sleep(0.01)
     radio.stopListening()
-    time.sleep(0.01)
-    buf = ['d', 'e', 'f', 'g']
-    radio.write(buf)
+    radio.write(recv_buffer)
     radio.startListening()
+    #print"sent"
 except KeyboardInterrupt:
  print "Terminating"
 finally:
