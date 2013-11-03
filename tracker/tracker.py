@@ -79,8 +79,12 @@ try:
    trackeraddrtokens = trackeraddr.split(":")
 
    if trackeraddr != ownaddr:
-    # Not our node, refuse registration
-    response = "USE " + trackeraddr + "\n"
+    # Not our node, rely the query
+    ts = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ts.connect((trackeraddrtokens[0], long(trackeraddrtokens[1],10)))
+    ts.send(query)
+    response = ts.recv(1024)
+    ts.close()
    else:
     nodeslocation[uid]=url
     response = "OK\n"
