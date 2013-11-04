@@ -8,12 +8,6 @@ pid2=$!
 ./tracker.py 192.168.0.250 3002 &
 pid3=$!
 echo Started tracker net.
-sleep 10s
-cd ../ap
-./ap.py AP0 4000
-pid4=$!
-./ap.py AP1 4001
-pid5=$!
 cd ..
-echo kill $pid1 $pid2 $pid3 $pid4 $pid5 > stop_iotp2p
+echo kill $pid1 $pid2 $pid3 > stop_iotp2p
 
