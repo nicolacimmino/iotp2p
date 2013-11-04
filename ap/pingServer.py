@@ -45,17 +45,16 @@ radio.startListening()
 try:
  while True:
     pipe = [0]
-    #while not radio.available(pipe, False): # Changed irq wait to False
-    #    time.sleep(1000/1000000.0)
-    #recv_buffer = []
-    #radio.read(recv_buffer)
-    cmd = radio.readString(pipe)
-    print cmd
+    while not radio.available(pipe, False): # Changed irq wait to False
+        time.sleep(1000/1000000.0)
+    recv_buffer = []
+    radio.read(recv_buffer)
+
 #    print recv_buffer
 #    time.sleep(0.01)
-#    radio.stopListening()
-#    radio.write(recv_buffer)
-#    radio.startListening()
+    radio.stopListening()
+    radio.write(recv_buffer)
+    radio.startListening()
     #print"sent"
 except KeyboardInterrupt:
  print "Terminating"

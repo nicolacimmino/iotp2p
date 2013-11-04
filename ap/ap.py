@@ -9,6 +9,7 @@
 import socket
 import shelve
 import sys
+from iotp2pran import iotp2pran
 from threading import Thread
 
 # Expect the first parameter to be the port to listen to
@@ -18,11 +19,33 @@ if len(sys.argv) != 3:
 
 global owntrackeraddr
 global owntrackerport
+global ownuri
 global ownport
+global APP_TERMINATING
 
-ownuri = sys.argv[1]
-ownport = long(sys.argv[2],10)
 
+def acceptRadioMessages():
+  while not APP_TERMINATING:
+    msg = RAN.readMessage([0])
+    if msg != "":
+      print msg
+    if owntracker != "":
+     msgtokens = msg.split(" ")
+     if len(msgtokens)==2 and msgtokens[0] == "REG":
+       # Forward the REG query and add our URL so messages for the
+       #  new node can come here.
+       s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+       s.connect((owntrackeraddr, owntrackerport)) 
+       print "conntected"
+       s.send(msg + " 192.168.0.8:" + str(ownport) + "\n")
+       print "sent"
+       response = s.recv(1024)
+       print "received"
+       s.close()
+       RAN.sendMessage(response + "\n")
+    else:
+     RAN.sendMessage("OFFLINE\n")
+# Accept messages relayed from other APs
 def acceptMessages(args):
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    s.bind(('', ownport))
@@ -41,9 +64,9 @@ def acceptMessages(args):
      raise
      print "Error while receving"
 
-if __name__ == "__main__":
-    thread = Thread(target = acceptMessages, args = (0,))
-    thread.start()
+#if __name__ == "__main__":
+#    thread = Thread(target = acceptMessages, args = (0,))
+#    thread.start()
 
 
 def sendMessage(uri, message, mac):
@@ -70,21 +93,43 @@ def sendMessage(uri, message, mac):
   s.close()
   print data
 
+
+ownuri = sys.argv[1]
+ownport = long(sys.argv[2],10)
+
 # Figure out who our tracker is
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(('192.168.0.250', 3000)) # Bootstrap node, cannot be hardcoded
-s.send('TRK ' + ownuri + '\n')
-owntracker = s.recv(1024)
-owntrackertokens = owntracker.split(':')
-owntrackeraddr = owntrackertokens[0]
-owntrackerport = long(owntrackertokens[1],10)
-print 'Own tracker: ' + owntracker
-s.close()
+try:
+ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+ s.connect(('192.168.0.250', 3000)) # Bootstrap node, cannot be hardcoded
+ s.send('TRK ' + ownuri + '\n')
+ owntracker = s.recv(1024)
+ owntrackertokens = owntracker.split(':')
+ owntrackeraddr = owntrackertokens[0]
+ owntrackerport = long(owntrackertokens[1],10)
+ print 'Own tracker: ' + owntracker
+ s.close()
+except:
+ print "Tracknet not available, commands will not be forwarded"
+ owntracker = ""
 
 urlcache = shelve.open("data/url_cache_"+ownuri)
 
-while 1:
- uid = raw_input('UID:')
- msg = raw_input('MSG:')
- sendMessage(uid, msg, 'C0BBAA')
+
+APP_TERMINATING = False
+RAN = iotp2pran()
+
+RAN.startNetwork()
+
+if __name__ == "__main__":
+  thread = Thread(target = acceptRadioMessages)
+  thread.start()
+
+
+wait=raw_input("Enter to terminate")
+RAN.stopNetwork()
+APP_TERMINATING = True
+exit()
+
+
+
 

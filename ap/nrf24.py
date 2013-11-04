@@ -427,7 +427,7 @@ class NRF24:
     def powerUp(self):
         self.write_register(NRF24.CONFIG, self.read_register(NRF24.CONFIG) & _BV(NRF24.PWR_UP))
         time.sleep(150 / 1000000.0)
-
+        
     def write(self, buf):
         # Begin the write
         self.startWrite(buf)
