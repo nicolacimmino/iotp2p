@@ -11,7 +11,8 @@ import select
 import shelve
 import os
 
-DATA_PATH = "~/.iotp2p/" # This is the most likely writeale place, we store here persistent data
+home = os.path.expanduser("~")
+DATA_PATH = home + "/.iotp2p/" # This is the most likely writeale place, we store here persistent data
 
 #
 # Send a command and get the reply.
@@ -44,7 +45,6 @@ if cmd == "flush":
 # Make sure we have a directory where to write to
 if not os.path.exists(DATA_PATH):
   os.makedirs(DATA_PATH)
-  print "created folder"
 
 # Open the cache of previously resolved queries
 cache = shelve.open(DATA_PATH + "cache")
