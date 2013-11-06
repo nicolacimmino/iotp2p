@@ -102,7 +102,7 @@ s.listen(1)
 try:
  while True:
   conn, query = waitCommand(s)
-  print ownport, ">", query
+  print ownport, ">", query + "\r"
   response = "UNKNOWN"
 
   # Tokenize on white spaces 
@@ -141,7 +141,7 @@ try:
     else:
      response = "NOTHERE"
 
-  print ownport, "<", response
+  print ownport, "<", response + "\n\r"
   sendResponse(conn, response)  
 except:
   print "Terminating."
