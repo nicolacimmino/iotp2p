@@ -71,8 +71,6 @@ class datagramtalk:
 
 
   def startServer ( self, ip, port, msg_hook ):
-   print "ok3"
-   print ip, port
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    s.bind( ( ip, port ) )
    s.listen( 1 )
