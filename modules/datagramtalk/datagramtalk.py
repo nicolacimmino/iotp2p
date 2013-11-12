@@ -32,7 +32,7 @@ class datagramtalk:
 
   # This constructor initializes the server and listens for messages.
   def __init__ ( self, ip, port, msg_hook ):
-    print "ok2"
+    # Nothing to do
 
     # Start a thread listeining for incoming messages.
     thread = Thread( target = self.startServer, args = ( ip, port, msg_hook ) )
