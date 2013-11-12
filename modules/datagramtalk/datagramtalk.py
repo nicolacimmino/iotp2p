@@ -1,14 +1,24 @@
+# Datagram-Talk provides simple TCP based stateless messaging between two applications
+#   Copyright (C) 2013 Nicola Cimmino
 #
-# DatagramTalk provides simple yet reliable network communication between two parties.
-# In DatagramTalk every transaction is constituted by a message, terminated by a \n send
-#  from the talker and one response terminated by \n by the other party. Connection is
-#  then terminated.
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 #
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see http://www.gnu.org/licenses/.
+
 from threading import Thread
 import socket
 import select
 
-class DatagramTalkServer:
+class datagramtalk:
 
   # When set causes the listening thread to terminate.
   __server_term = False
@@ -22,7 +32,7 @@ class DatagramTalkServer:
 
   # This constructor initializes the server and listens for messages.
   def __init__ ( self, ip, port, msg_hook ):
-    print "ok2"
+    # Nothing to do
 
     # Start a thread listeining for incoming messages.
     thread = Thread( target = self.startServer, args = ( ip, port, msg_hook ) )
@@ -61,8 +71,6 @@ class DatagramTalkServer:
 
 
   def startServer ( self, ip, port, msg_hook ):
-   print "ok3"
-   print ip, port
    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    s.bind( ( ip, port ) )
    s.listen( 1 )
