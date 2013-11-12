@@ -8,7 +8,7 @@ from threading import Thread
 import socket
 import select
 
-class DatagramTalkServer:
+class datagramtalk:
 
   # When set causes the listening thread to terminate.
   __server_term = False
