@@ -4,15 +4,11 @@
 #
 # Nicola Cimmino 2013
 #
-# This proof of concept tracker reads a roster of trackers and listens for UDP traffic on the 
+# This proof of concept tracker reads a roster of trackers and listens for TCP traffic on the 
 #	specified port serving clients. No provision is made at the moment to update the roster.
 #
 # We make use of hash_ring by Amix (http://amix.dk/blog/post/19367)
 #
-# TODO! We make use of shelve this has apparently the risk of allowing arbitrary code execution if malicious data
-#	is loaded. This proof of concept doens't validate REG URLs so we actualy allow to remotely
-#	place anything in the cache!
-# 
 import sys
 import socket
 import shelve
