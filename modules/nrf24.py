@@ -11,8 +11,8 @@
 # Python port of Maniacbug NRF24L01 library
 # Author: Joao Paulo Barraca <jpbarraca@gmail.com>
 #
+# Nicola Cimmino 14.11.2013 Changed to import RPi.GPIO in place of Adafruit libs
 
-#import Adafruit_BBIO.GPIO as GPIO
 import RPi.GPIO as GPIO
 import spidev
 import time
