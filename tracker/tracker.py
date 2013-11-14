@@ -77,7 +77,12 @@ ownaddr = sys.argv[1]
 ownuri = sys.argv[1] + ":" + sys.argv[2]
 
 #Get the trackers roster from file
-trackers_urls = open("data/trackers_roster").read().splitlines()
+try:
+  trackers_urls = open("data/trackers_roster").read().splitlines()
+except:
+  print "Could not find trackers roster"
+  print "Please create file data/trackers_roster and add trackers to it."
+  sys.exit(1)
 
 #And place the valid lines into a list of trackers
 trackers = []
