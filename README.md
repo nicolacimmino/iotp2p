@@ -1,3 +1,5 @@
+iotp2p V0.0
+
 iotp2p provides p2p communication for the Internet of Things.
 
 This project is still in its infancy and anything in this repository provides any real functionality yet.
