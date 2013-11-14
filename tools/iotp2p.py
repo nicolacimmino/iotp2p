@@ -1,6 +1,19 @@
 #!/usr/bin/env python
+# iotpp2p2 command line tool provides simple script interaction with iotp2p nodes
+#   Copyright (C) 2013 Nicola Cimmino
 #
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 #
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see http://www.gnu.org/licenses/.
 
 import sys
 import subprocess
@@ -50,7 +63,7 @@ if not os.path.exists(DATA_PATH):
 cache = shelve.open(DATA_PATH + "cache")
 
 # Since we are a tool we don't have a real URI. Nonetheless to be good tracker net
-#  citizens we randomize our URI so that the load or queries done trough this tool
+#  citizens we randomize our URI so that the load of queries done trough this tool
 #  is speread across the tracker net.
 # We do cache this URI though otherwise we will prevent all following cache to function
 if not cache.has_key("ownuri"):
