@@ -1,14 +1,20 @@
 #!/usr/bin/env python
+# Proof of concept implementation of a iotp2p tracker. Provides no security.
+#   Copyright (C) 2013 Nicola Cimmino
 #
-# Proof of concept implementation of a tracker for IoT P2P
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 #
-# Nicola Cimmino 2013
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 #
-# This proof of concept tracker reads a roster of trackers and listens for TCP traffic on the 
-#	specified port serving clients. No provision is made at the moment to update the roster.
-#
-# We make use of hash_ring by Amix (http://amix.dk/blog/post/19367)
-#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see http://www.gnu.org/licenses/.
+
 import sys
 import socket
 import shelve
