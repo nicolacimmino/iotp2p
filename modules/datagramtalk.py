@@ -34,12 +34,17 @@ class datagramTalkMessage:
     if len( message_tokens ) > 1:
       self.arguments =  message_tokens[1:]
 
+    # Store the raw message
+    self.raw = message
+
   # The statement part of the message.
   statement = ""
 
   # The arguments of the statement.
   arguments = []
-  
+
+  # The raw message as it was received.  
+  raw = ""
 
 class datagramtalk:
 
@@ -47,7 +52,7 @@ class datagramtalk:
   __server_term = False
 
   # Receiver timeout in mS, max time waited for data once a connection is extablished.
-  __rx_timeout = 1000
+  __rx_timeout = 10000
 
   # Default constructor, doesn't listen only allows to send messages. 
   def __init__( self ):
@@ -65,8 +70,8 @@ class datagramtalk:
   def stopListening( self ):
     self.__server_term = True
 
-  # Send a command and get the reply.
-  def sendCommand( self, ip, port, command ):
+  # Send a message and get the reply.
+  def sendMessage( self, ip, port, command ):
     try:
       s = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
       s.connect( ( ip, port ) )
@@ -116,7 +121,8 @@ class datagramtalk:
           client_socket.close()      
           timeout = True
          if not timeout:
-          response = msg_hook(datagramTalkMessage(query[0:-1])) # Process the command and get the response
+          query = query.translate(None, '\r\n')
+          response = msg_hook(datagramTalkMessage(query)) # Process the command and get the response
           client_socket.send(response + "\n")
           client_socket.close()
     except:
