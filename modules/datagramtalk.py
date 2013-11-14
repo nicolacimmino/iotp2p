@@ -17,6 +17,7 @@
 from threading import Thread
 import socket
 import select
+import sys
 
 #
 # A Datagram message conveniently split into its tokens
@@ -125,9 +126,9 @@ class datagramtalk:
           response = msg_hook(datagramTalkMessage(query)) # Process the command and get the response
           client_socket.send(response + "\n")
           client_socket.close()
+          break;
     except:
       # Something went wrong, keep going with other connections
       print "Error while serving incoming traffic."
-
 
 
