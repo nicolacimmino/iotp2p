@@ -68,7 +68,8 @@ url = config.get(uri, 'url')
 iotp2p = iotp2p()
 
 # Register our node on the trackernet so that we can receive messages
-iotp2p.registerNode( uri, url )
+response = iotp2p.registerNode( uri, url )
+print "response: ", response.raw
 
 # Initialize the server.
 # Use function reply_to_message to handle incoming requests.
