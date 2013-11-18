@@ -4,6 +4,9 @@ from datagramtalk import datagramtalk
 
 class iotp2p:
 
+  # DatagramTalk object used to send commands.
+  dtg = datagramtalk( None, None, None )
+
   #
   # Attempts to get a boostrap node for the given domain.
   def getBootstrapNode(self, domain ):
@@ -24,33 +27,23 @@ class iotp2p:
       uid, domain = uri.split( "@" )
       # Find a bootstrap node for the tracker net      
       server, port = self.getBootstrapNode( domain )
-
       print "Attempting to register on ", server, port      
       # Register with the net
-      dtg = datagramtalk( None, None, None )
       print  "REG " + uri + " " + url
-      return dtg.sendMessage( server, port, "REG " + uri + " " + url )
+      return self.dtg.sendMessage( server, port, "REG " + uri + " " + url )
     except:
-      raise
       return "NOK"
 
-    def sendMessage( self, uri, message ):
-	  try:
-	    # TODO: add cache here for now we always lookup
-		uid, domain = uri.split("@")
-		tracker = getBootstrapNode( domain )
-		address, port = tracker.split(":")
-		dgt = datagramtalk( None, None, None )
-		retrun dtg.sendMessage( address, port, message)
-	  except:
-	    raise
-		return "NOK"
-		
-# Add send message:
-# lookup URL in chache
-# send message to that url
-# if not found or no reply find trackernet node
-# issue LOC
-# send message
-
+  def sendMessage( self, uri, message ):
+      try:
+        # TODO: add cache here for now we always lookup
+        uid, domain = uri.split("@")
+        taddress, tport = self.getBootstrapNode( domain )
+        response = self.dtg.sendMessage( taddress, tport, "LOC " + uri )
+        naddress = response.raw.split(":")[0]
+        nport = int(response.raw.split(":")[1],10)
+        return self.dtg.sendMessage( naddress, nport, "MSG " + message )
+      except:
+        return "NOK"
+	
 

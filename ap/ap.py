@@ -20,6 +20,7 @@ import shelve
 import sys
 from iotp2pran import iotp2pran
 from threading import Thread
+from iotp2p import iotp2p
 
 # Expect the first parameter to be the port to listen to
 if len(sys.argv) != 3:
@@ -38,24 +39,21 @@ def acceptRadioMessages():
     msg = RAN.readMessage([0])
     if msg != "":
       print msg
-    if owntracker != "":
-     msgtokens = msg.split(" ")
+    msgtokens = msg.split(" ")
      
-	 if len(msgtokens)==2 and msgtokens[0] == "REG":
+    if len(msgtokens)==2 and msgtokens[0] == "REG":
        response = iotp2p.registerNode( msgtokens[1], ownuri ) 
-       RAN.sendMessage(response + "\n")
+       RAN.sendMessage(response.raw + "\n")
 	   
-	 if len(msgtokens)>2 and msgtokens[0] == "MSG":
+    if len(msgtokens)>2 and msgtokens[0] == "MSG":
 	   # Send message trough iotp2p
 	   uri = msgtokens[1]
-	   message = msgtokens[2:]
+	   message = " ".join(msgtokens[2:])
 	   iotp2p.sendMessage( uri, message )
-    else:
-     RAN.sendMessage("OFFLINE\n")
 	 
-
 ownuri = sys.argv[1]
 ownport = long(sys.argv[2],10)
+owntracker = "x"
 
 # iotp2p protocol library
 iotp2p = iotp2p()
