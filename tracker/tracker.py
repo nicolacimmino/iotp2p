@@ -22,9 +22,6 @@ import select
 from hash_ring import HashRing
 from datagramtalk import datagramtalk
 
-#global dts
-#global nodeslocation
-
 #
 # Gets the tracker URL, IP and port for a given URI
 def getTracker(uri):
