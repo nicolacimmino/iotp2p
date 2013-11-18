@@ -22,7 +22,7 @@ RF24 radio(9,10);
 // Second was 71 in the end
 const uint64_t pipes[2] = { 0x7070707070LL, 0x7070707071LL };
 
-String uid = "N000";
+String uid = "N000@nicolacimmino.com";
 
 // Indicates that we have entered a network and we can send data.
 bool network_ok = false;
