@@ -1,21 +1,21 @@
 #!/bin/bash
 ### BEGIN INIT INFO
-# Provides:          PyNode
+# Provides:          Tracker
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Proof of concept pynode, only logs received messages.
-# Description:       Used to ensure pynode starts/stops etc
+# Short-Description: Proof of concept tracker.
+# Description:       Used to ensure tracker starts/stops etc
 ### END INIT INFO
 
 DAEMON_PATH="/usr/sbin/pynode"
 
-DAEMON="python pynode.py 4000"
+DAEMON="python pynode.py logger@nicolacimmino.com"
 DAEMONOPTS=""
 
-NAME="pynode"
-DESC="Runs pynode"
+NAME="pynodelogger"
+DESC="Runs a demo logger pynode"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 

@@ -16,11 +16,14 @@
 #    along with this program.  If not, see http://www.gnu.org/licenses/.
 
 from datagramtalk import datagramtalk
+from iotp2p import iotp2p
 import sys
 import datetime
 import atexit
+import ConfigParser
 
 global dts
+global iotp2p
 
 # This will hanle incoming requests.
 # As an example we just reply "OK" and print the received message.
@@ -43,11 +46,29 @@ def stop_server():
   
 # Get command line parameters
 if not len(sys.argv) == 2:
-  print "Usage pynode port"
+  print "Usage pynode uri"
   exit(1)
 
-# First argument is the port number.
-port = int(sys.argv[1],10)
+# First argument is the URI of the node.
+uri = sys.argv[1]
+
+# Get from the config file the settings for this URI
+config = ConfigParser.RawConfigParser()
+config.read('/etc/pynode/pynode.conf')
+
+# Get the local port on which we listen.
+# Note that this can be different than the one in the URI since
+#  we could be reached trough a DNAT
+port = config.getint(uri, 'localport')
+
+# Get the url to which we can be reached
+url = config.get(uri, 'url')
+
+# iotp2p protocol library
+iotp2p = iotp2p()
+
+# Register our node on the trackernet so that we can receive messages
+iotp2p.registerNode( uri, url )
 
 # Initialize the server.
 # Use function reply_to_message to handle incoming requests.
