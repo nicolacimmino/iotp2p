@@ -40,86 +40,25 @@ def acceptRadioMessages():
       print msg
     if owntracker != "":
      msgtokens = msg.split(" ")
-     if len(msgtokens)==2 and msgtokens[0] == "REG":
-       # Forward the REG query and add our URL so messages for the
-       #  new node can come here.
-       s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-       s.connect((owntrackeraddr, owntrackerport)) 
-       print "conntected"
-       s.send(msg + " 192.168.0.8:" + str(ownport) + "\n")
-       print "sent"
-       response = s.recv(1024)
-       print "received"
-       s.close()
+     
+	 if len(msgtokens)==2 and msgtokens[0] == "REG":
+       response = iotp2p.registerNode( msgtokens[1], ownuri ) 
        RAN.sendMessage(response + "\n")
+	   
+	 if len(msgtokens)>2 and msgtokens[0] == "MSG":
+	   # Send message trough iotp2p
+	   uri = msgtokens[1]
+	   message = msgtokens[2:]
+	   iotp2p.sendMessage( uri, message )
     else:
      RAN.sendMessage("OFFLINE\n")
-# Accept messages relayed from other APs
-def acceptMessages(args):
-   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-   s.bind(('', ownport))
-   s.listen(1)
-   try:
-    while 1:
-     conn, addr = s.accept()
-     query = ""
-     while  not query.endswith("\n") and len(query) < 1024:
-      data = conn.recv(1024)
-      query += data
-     print ">", query
-     #conn.send('OK\n')
-     conn.close()
-   except:
-     raise
-     print "Error while receving"
-
-#if __name__ == "__main__":
-#    thread = Thread(target = acceptMessages, args = (0,))
-#    thread.start()
-
-
-def sendMessage(uri, message, mac):
-  # See if we have cached the URL for this URI
-  #  if not we get it from the tracker.
-  if not urlcache.has_key(uri):
-    ts = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ts.connect((owntrackeraddr, owntrackerport))
-    ts.send("LOC "+uri+'\n')
-    url = ts.recv(1024)
-    ts.close()
-    urlcache[uri]=url;
-  else:
-    url = urlcache[uri]
-
-  print 'Located to url: '+url
-
-  # Send the message now that we know the URL
-  urltokens = url.split(':')  
-  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-  s.connect((urltokens[0], long(urltokens[1],10)))
-  s.send('MSG ' + uri + ' ' + mac+'\n')
-  data = s.recv(1024)
-  s.close()
-  print data
-
+	 
 
 ownuri = sys.argv[1]
 ownport = long(sys.argv[2],10)
 
-# Figure out who our tracker is
-try:
- s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
- s.connect(('192.168.0.250', 3000)) # Bootstrap node, cannot be hardcoded
- s.send('TRK ' + ownuri + '\n')
- owntracker = s.recv(1024)
- owntrackertokens = owntracker.split(':')
- owntrackeraddr = owntrackertokens[0]
- owntrackerport = long(owntrackertokens[1],10)
- print 'Own tracker: ' + owntracker
- s.close()
-except:
- print "Tracknet not available, commands will not be forwarded"
- owntracker = ""
+# iotp2p protocol library
+iotp2p = iotp2p()
 
 urlcache = shelve.open("data/url_cache_"+ownuri)
 

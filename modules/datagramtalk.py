@@ -55,13 +55,11 @@ class datagramtalk:
   # Receiver timeout in mS, max time waited for data once a connection is extablished.
   __rx_timeout = 10000
 
-  # Default constructor, doesn't listen only allows to send messages. 
-  def __init__( self ):
-    print "ok"
-
   # This constructor initializes the server and listens for messages.
   def __init__( self, ip, port, msg_hook ):
-    # Nothing to do
+
+    if ip == None:
+      return
 
     # Start a thread listeining for incoming messages.
     thread = Thread( target = self.startServer, args = ( ip, port, msg_hook ) )

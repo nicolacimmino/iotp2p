@@ -19,8 +19,8 @@
 
 mkdir -p /usr/sbin/pynode
 cp pynode.py /usr/sbin/pynode/
-cp ../modules/datagramtalk.py /usr/sbin/pynode/
-cp ../modules/hash_ring.py /usr/sbin/pynode/
+cp ../../modules/datagramtalk.py /usr/sbin/pynode/
+cp ../../modules/iotp2p.py /usr/sbin/pynode/
 cp pynodelogger /etc/init.d/
 
 update-rc.d pynodelogger defaults
