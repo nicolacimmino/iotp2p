@@ -1,3 +1,9 @@
+#
+# This is taken from http://amix.dk/blog/post/19367 
+# There is no mention of licence in the blog, seems BSD from sources
+#  check with author and check BSD licence terms. Ideally we want GPL
+# Eventually re-implement, it's quite simple and can be made simpler for our needs
+# In fact at the moment we don't really need a DHT in truth
 import md5
 
 class HashRing(object):
