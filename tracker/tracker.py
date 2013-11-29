@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-# Proof of concept implementation of a iotp2p tracker. Provides no security.
+# Rel.0 implementation of a iotp2p tracker. Rel.0 of iotp2p supports
+#    single trackers that serve a single domain. There is no trackers
+#    swarming at this stage.
 #   Copyright (C) 2013 Nicola Cimmino
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -19,102 +21,77 @@ import sys
 import socket
 import shelve
 import select
-from hash_ring import HashRing
+import atexit
 from datagramtalk import datagramtalk
-
-#
-# Gets the tracker URL, IP and port for a given URI
-def getTracker(uri):
-  trackeraddr = ring.get_node(uri)
-  trackeraddrtokens = trackeraddr.split(":")
-  return trackeraddr, trackeraddrtokens[0], int(trackeraddrtokens[1],10)
+from datagramtalk import datagramTalkMessage
 
 
-def reply_to_message( query ):
-  #global dts
-  #global nodeslocation
+def serve_request( request ):
+ 
   try:
-    print ownport, ">", query.raw + "\r"
-    response = "UNKNOWN"
-
-    # Client wants to find the proper tracker for a given URL
-    if len(query.arguments) == 1 and query.statement == "TRK":
-     response = ring.get_node(query.arguments[0])
-
+    #print own_port, ">", request.raw + "\r"
+    response = datagramTalkMessage( "" )
+    response.protocol = "iotp2p.track"
+    response.protocol_version = "0.0"
+    
     # Client wants to register with the tracker
-    if len(query.arguments) == 2 and  query.statement == "REG":
-     uri=query.arguments[0]
-     url=query.arguments[1]   
-     trackerurl, trackerip, trackerport = getTracker(uri)
-
-     if trackerurl != ownuri:
-      # Not our node, rely the query
-      response = dts.sendMessage(trackerip, trackerport, query.raw).raw
-     else:
-      # Cache the URL of this URI
-      nodeslocation[uri]=url
-      nodeslocation.sync()
-      response = "OK"
+    if request.statement == "REG":
+     uri=request.parameters['uri']
+     url=request.parameters['url']   
+     
+     if not uri == "" and not url == "":
+       # TODO: here we need to get the VCode and verify the MAC
+       # against the stored secret for this node.
+     
+       # Cache the URL of this URI
+       nodeslocation[str(uri)]=url
+       nodeslocation.sync()
+       response.parameters['result'] = "OK"
  
     # Client wants to locate a node
-    if len(query.arguments) == 1 and  query.statement == "LOC":
-     uri=query.arguments[0]
-     trackerurl, trackerip, trackerport = getTracker(uri)
-   
-     if trackerurl != ownuri:
-      # Not our node, rely the query
-      response = dts.sendMessage(trackerip, trackerport, query.raw)
+    if request.statement == "LOC":
+     uri=request.arguments['uri']
+     
+     if nodeslocation.has_key(uri):  
+       response.parameters['result'] = "OK"
+       response.parameters['uri'] = nodeslocation[uri]
      else:
-      if nodeslocation.has_key(uri):  
-       response = nodeslocation[uri]
-      else:
-       print uri+"|"
-       response = "NOTHERE"
+       response.parameters['result'] = "NOK"
+       response.parameters['reason'] = "NOTHERE"
+       
 
-    print ownport, "<", response + "\n\r"
+    print own_port, "<", response.raw + "\n\r"
     return response
   except:
-    return ""
-
-
+    raise
+    response.parameters['result'] = "NOK"
+    response.parameters['reason'] = "ERROR"
+    return response
+	
+def stop_dts():
+    dts.stopListening()
+	
 # Expect the first parameter to be the port to listen to
-if len(sys.argv) != 3:
- print "Usage: tracker extip port"
+if len(sys.argv) != 2:
+ print "Usage: tracker port"
  sys.exit(1)
 
-ownport = long(sys.argv[2],10)
-ownaddr = sys.argv[1]
-ownuri = sys.argv[1] + ":" + sys.argv[2]
-
-#Get the trackers roster from file
-try:
-  trackers_urls = open("data/trackers_roster").read().splitlines()
-except:
-  print "Could not find trackers roster"
-  print "Please create file data/trackers_roster and add trackers to it."
-  sys.exit(1)
-
-#And place the valid lines into a list of trackers
-trackers = []
-for tracker_url in trackers_urls:
- if tracker_url != "":
-  trackers.append(tracker_url)
+own_port = long(sys.argv[1],10)
 
 # Open the cache of nodes location
-nodeslocation = shelve.open("data/nodes_location_"+ownuri)
-
-#Distribute the trackers along the ring with 3 replicas for each
-# this helps to improve distribution.
-ring = HashRing(trackers,3)
+nodeslocation = shelve.open("data/nodes_location_" + str( own_port ) )
 
 # Initialize the server.
-dts = datagramtalk('', ownport, reply_to_message )
+dts = datagramtalk('', own_port, serve_request )
+
+# Make sure we always stop listening even if we get killed.  
+atexit.register( stop_dts )
 
 # Wait here for user to want to exit.
 raw_input( "Press enter to stop...." )
 
-# We need to stop listening before leaving, otherwise the
-#  serving thread will stay in memory.
+# Stop listening. Note the atexit will not fire here since we have threads still running.
 dts.stopListening()
+
 
 

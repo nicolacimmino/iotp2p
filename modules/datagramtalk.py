@@ -18,6 +18,7 @@ from threading import Thread
 import socket
 import select
 import sys
+import json
 
 #
 # A Datagram message conveniently split into its parts and with the 
@@ -44,23 +45,22 @@ class datagramTalkMessage:
     
     try:
       if not message == "":
-        # Tolerate \r\n, split lines on \n
-        message_lines = message.translate(None, 'r').split('\n')
-
-        # The first line is:
-        # protocol version statement
-        tokens = message_lines[0].split( ' ' )
-        self.protocol = tokens[0]
-        self.protocol_version = tokens[1]
-        self.statement = tokens[2]
+        print ""
+        print message
+        print ""
+        message_data = json.loads(message)
         
-        # Find all parameters
-        for message_line in message_lines:
-          if '=' in message_line:
-            tokens = message_line.split( '=' )
-            self.parameters[tokens[0]] = tokens[1]
+        # iotp2p.02.0 DatagramTalk request schema mandates these params so we can just
+        #    parse them and fail if they are not present.
+        self.protocol = message_data['protocol']
+        self.protocol_version = message_data['version']
+        self.statement = message_data['statement']
+        
+        # Give access to all parameters
+        self.parameters = message_data
     except:
-       # Something went wrong just store the raw message
+       raise
+       # Something went wrong just do nothing
        print "Exception while parsing dtalk message"
        
     # Store the raw message
@@ -69,16 +69,20 @@ class datagramTalkMessage:
   def toRaw( self ):
     self.raw = ""
     
-    # First line has protocol, version and statement
-    self.raw += self.protocol + " " + self.protocol_version + " " + self.statement + "\n"
+    datagram = []
     
-    # Following lines are the params
+    datagram.append( { 'protocol' : self.protocol } )
+    datagram.append( { 'version' : self.protocol_version } )
+    datagram.append( { 'statement' : self.statement } )
+    
+    # Add all parameters, avoid eventual duplicates of the basic ones.
     for key in self.parameters.keys():
-      self.raw += key + "=" + self.parameters[key] + "\n"
+      if not key == "protocol" and not key == "version" and not key == "statement":
+        datagram.append( { key: self.parameters[key]} )
 
-    # Close the message with an empty line
-    self.raw += "\n"
-
+    # Convert to json
+    self.raw = json.dumps( datagram )
+    
     # Als return the raw message
     return self.raw
     
@@ -122,13 +126,15 @@ class datagramtalk:
       s.send( datagram.toRaw() )
       response = ""
       timeout = False;
-      while not (response.endswith("\n\n") or response.endswith("\r\n\r\n")) and len( response ) < __rx_buffer_size and not timeout:
+      complete = False
+      while len(response) < self.__rx_buffer_size and not timeout and not complete:
        
        # Allow data to come in chunks but don't wait more than rx_timeout
        ready = select.select( [s], [], [], self.__timer_Tb_timeout )
        if ready[0]:
-         data = s.recv( __rx_buffer_size )
+         data = s.recv( self.__rx_buffer_size )
          response += data
+         complete = (response.count("{") > 0 and (response.count("{") == response.count("}")))
        else:
          response = ""
          timeout = True
@@ -156,20 +162,23 @@ class datagramtalk:
         client_socket, address = server_socket.accept()
         query = ""
         timeout = False;
-        while  not (query.endswith("\n\n") or query.endswith("\r\n\r\n")) and len(query) < 1024 and not timeout:
+        complete = False
+        while len(query) < self.__rx_buffer_size and not timeout and not complete:
          ready = select.select( [client_socket], [], [], self.__timer_Ta_timeout )
          if ready[0]:
-          data = client_socket.recv(1024)
+          data = client_socket.recv( self.__rx_buffer_size )
           query += data
+          complete = (query.count("{") > 0 and (query.count("{") == query.count("}")))
          else:
           client_socket.close()      
           timeout = True
-         if not timeout:
+        if not timeout:
           response = msg_hook( datagramTalkMessage( query ) ) # Process the request and get the response
-          client_socket.send(response)
+          client_socket.send( response.toRaw() )
           client_socket.close()
           break;
     except:
+      raise
       # Something went wrong, keep going with other connections
       print "Error while serving incoming traffic."
 
