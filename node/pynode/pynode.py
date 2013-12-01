@@ -29,7 +29,7 @@ global iotp2p
 # As an example we just reply "OK" and print the received message.
 def reply_to_message( cmd ):
   f = open('/var/log/pynode.log', 'a')
-  timestamp = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S")
+  timestamp = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S,%03d")
   if cmd.statement == "MSG":
    f.write(timestamp + " " + cmd.raw + "\n")
    response = "OK"
