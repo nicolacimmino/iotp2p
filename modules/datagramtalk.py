@@ -59,7 +59,6 @@ class datagramTalkMessage:
         # Give access to all parameters
         self.parameters = message_data
     except:
-       raise
        # Something went wrong just do nothing
        print "Exception while parsing dtalk message"
        
@@ -86,7 +85,7 @@ class datagramTalkMessage:
     # Als return the raw message
     return self.raw
     
-class datagramtalk:
+class datagramTalk:
 
   # When set causes the listening thread to terminate.
   __server_term = False
@@ -108,8 +107,7 @@ class datagramtalk:
 
   # This constructor initializes the server and listens for messages.
   def __init__( self, ip, port, msg_hook ):
-    # Nothing to do
-
+   
     # Start a thread listeining for incoming messages.
     thread = Thread( target = self.startServer, args = ( ip, port, msg_hook ) )
     thread.start()
@@ -178,7 +176,6 @@ class datagramtalk:
           client_socket.close()
           break;
     except:
-      raise
       # Something went wrong, keep going with other connections
       print "Error while serving incoming traffic."
 

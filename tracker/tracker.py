@@ -22,7 +22,7 @@ import socket
 import shelve
 import select
 import atexit
-from datagramtalk import datagramtalk
+from datagramtalk import datagramTalk
 from datagramtalk import datagramTalkMessage
 
 
@@ -82,7 +82,7 @@ own_port = long(sys.argv[1],10)
 nodeslocation = shelve.open("data/nodes_location_" + str( own_port ) )
 
 # Initialize the server.
-dts = datagramtalk('', own_port, serve_request )
+dts = datagramTalk('', own_port, serve_request )
 
 # Make sure we always stop listening even if we get killed.  
 atexit.register( stop_dts )
@@ -92,6 +92,3 @@ raw_input( "Press enter to stop...." )
 
 # Stop listening. Note the atexit will not fire here since we have threads still running.
 dts.stopListening()
-
-
-
