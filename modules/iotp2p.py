@@ -1,11 +1,11 @@
 
 import dns.resolver # http://www.dnspython.org
-from datagramtalk import datagramtalk
+from datagramtalk import datagramTalk
 
 class iotp2p:
 
   # DatagramTalk object used to send commands.
-  dtg = datagramtalk( None, None, None )
+  dtg = datagramTalk( None, None, None )
 
   #
   # Attempts to get a boostrap node for the given domain.
