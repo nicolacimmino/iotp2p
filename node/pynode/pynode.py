@@ -30,12 +30,13 @@ global iotp2p
 def reply_to_message( cmd ):
   f = open('/var/log/pynode.log', 'a')
   timestamp = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S,%03d")
+  response = datagramTalkMessage()
   if cmd.statement == "MSG":
    f.write(timestamp + " " + cmd.raw + "\n")
-   response = "OK"
+   response.parameters['result'] = "ACK"
   else:
    f.write(timestamp + " Unknown command:" + cmd.raw + "\n")
-   response = "NOK"	
+   response.parameters['result'] = "NACK"	
   f.close()
   return response
 
