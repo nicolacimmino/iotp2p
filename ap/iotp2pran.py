@@ -91,9 +91,9 @@ class iotp2pran:
      self.radio.stopListening()
      self.sendMessage("BCH:IOT0.0")
      self.radio.startListening()
-	 slot = -1
-     while not slot == 0
-		block, frame, slot, ta = self.getRadioTime()
+     slot = -1
+     while not slot == 0:
+       block, frame, slot, ta = self.getRadioTime()
 	
 
   def startNetwork(self):

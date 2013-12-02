@@ -21,6 +21,7 @@ import sys
 from iotp2pran import iotp2pran
 from threading import Thread
 from iotp2p import iotp2p
+from datagramtalk import datagramTalkMessage
 
 # Expect the first parameter to be the port to listen to
 if len(sys.argv) != 3:
@@ -49,7 +50,12 @@ def acceptRadioMessages():
 	   # Send message trough iotp2p
 	   uri = msgtokens[1]
 	   message = " ".join(msgtokens[2:])
-	   iotp2p.sendMessage( uri, message )
+           dtgm = datagramTalkMessage( "" )
+           dtgm.protocol = "iotp2p.message"
+	   dtgm.protocol_version = "0.0"
+           dtgm.statement = "MSG"
+           dtgm.parameters['to'] = uri
+	   iotp2p.sendMessage( uri, dtgm )
 	 
 ownuri = sys.argv[1]
 ownport = long(sys.argv[2],10)
