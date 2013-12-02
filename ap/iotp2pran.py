@@ -68,9 +68,9 @@ class iotp2pran:
         for c in recv_buf:
           if c != 0 and c<128:
             recv_str += str(unichr(c))
-	  block, frame, slot, ta = self.getRadioTime()
-	  sendMessage(str(ta))
-	  print("{}:{}:{}.{}".format(block, frame, slot, ta))
+      block, frame, slot, ta = self.getRadioTime()
+      sendMessage(str(ta))
+      print("{}:{}:{}.{}".format(block, frame, slot, ta))
       return recv_str[0:-1]
 
   def sendMessage(self, command):
@@ -91,10 +91,10 @@ class iotp2pran:
      self.radio.stopListening()
      self.sendMessage("BCH:IOT0.0")
      self.radio.startListening()
-	 slot = -1
-     while not slot == 0
-		block, frame, slot, ta = self.getRadioTime()
-	
+     slot = -1
+     while not slot == 0:
+        block, frame, slot, ta = self.getRadioTime()
+    
 
   def startNetwork(self):
    self.SHUTDOWN_SIGNAL = False
@@ -106,11 +106,11 @@ class iotp2pran:
 
   def getRadioTime(self):
     current_milli_time = int(round(time.time() * 1000))
-	radio_time = (current_milli_time % 60) / 100.0
-	block = int(floor(radio_time/100))
-	frame = int(floor((radio_time-block*100)/10))
-	slot = radio_time % 10
-	ta = radio_time - int(floor(radio_time))
-	return block, frame, slot, ta
-	
-	
+    radio_time = (current_milli_time % 60) / 100.0
+    block = int(floor(radio_time/100))
+    frame = int(floor((radio_time-block*100)/10))
+    slot = radio_time % 10
+    ta = radio_time - int(floor(radio_time))
+    return block, frame, slot, ta
+    
+    
