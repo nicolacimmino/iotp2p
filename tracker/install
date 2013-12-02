@@ -21,7 +21,6 @@ mkdir -p /usr/sbin/tracker
 cp tracker.py /usr/sbin/tracker/
 cp data /usr/sbin/tracker -r
 cp ../modules/datagramtalk.py /usr/sbin/tracker/
-cp ../modules/hash_ring.py /usr/sbin/tracker/
 cp tracker /etc/init.d/
 
 update-rc.d tracker defaults
