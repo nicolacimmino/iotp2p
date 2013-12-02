@@ -15,7 +15,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see http://www.gnu.org/licenses/.
 
-from datagramtalk import datagramtalk
+from datagramtalk import datagramTalk
 from iotp2p import iotp2p
 import sys
 import datetime
@@ -74,7 +74,7 @@ print "response: ", response.raw
 
 # Initialize the server.
 # Use function reply_to_message to handle incoming requests.
-dts = datagramtalk( "0.0.0.0", port, reply_to_message )
+dts = datagramTalk( "0.0.0.0", port, reply_to_message )
 
 # Make sure we always stop listening even if we get killed.  
 atexit.register(stop_server)
