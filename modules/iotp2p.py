@@ -1,6 +1,7 @@
 
 import dns.resolver # http://www.dnspython.org
 from datagramtalk import datagramTalk
+from datagramtalk import datagramTalkMessage
 
 class iotp2p:
 
@@ -29,10 +30,17 @@ class iotp2p:
       server, port = self.getBootstrapNode( domain )
       print "Attempting to register on ", server, port      
       # Register with the net
-      print  "REG " + uri + " " + url
-      return self.dtg.sendMessage( server, port, "REG " + uri + " " + url )
+      dgtm = datagramTalkMessage( "" );
+      dgtm.protocol = "tracker";
+      dgtm.protocol_version = "0.0"
+      dgtm.statement = "REG"
+      dgtm.parameters['uri'] = uri;
+      dgtm.parameters['uri'] = url;
+      return self.dtg.sendDatagram( server, port, dgtm )
     except:
-      return "NOK"
+      dgtm = datagramTalkMessage( "" );
+      dgtm.parameters['result'] = "NACK"
+      return dgtm
 
   def sendMessage( self, uri, message ):
       try:
@@ -45,5 +53,5 @@ class iotp2p:
         return self.dtg.sendMessage( naddress, nport, "MSG " + message )
       except:
         return "NOK"
-	
+    
 

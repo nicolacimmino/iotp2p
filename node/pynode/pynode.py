@@ -16,6 +16,7 @@
 #    along with this program.  If not, see http://www.gnu.org/licenses/.
 
 from datagramtalk import datagramTalk
+from datagramtalk import datagramTalkMessage
 from iotp2p import iotp2p
 import sys
 import datetime
@@ -30,7 +31,7 @@ global iotp2p
 def reply_to_message( cmd ):
   f = open('/var/log/pynode.log', 'a')
   timestamp = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S,%03d")
-  response = datagramTalkMessage()
+  response = datagramTalkMessage( "" )
   if cmd.statement == "MSG":
    f.write(timestamp + " " + cmd.raw + "\n")
    response.parameters['result'] = "ACK"

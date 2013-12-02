@@ -68,21 +68,21 @@ class datagramTalkMessage:
   def toRaw( self ):
     self.raw = ""
     
-    datagram = []
-    
-    datagram.append( { 'protocol' : self.protocol } )
-    datagram.append( { 'version' : self.protocol_version } )
-    datagram.append( { 'statement' : self.statement } )
-    
+    datagram = {}
+
+    datagram['protocol'] = self.protocol
+    datagram['version'] = self.protocol_version
+    datagram['statement'] = self.statement
+
     # Add all parameters, avoid eventual duplicates of the basic ones.
     for key in self.parameters.keys():
       if not key == "protocol" and not key == "version" and not key == "statement":
-        datagram.append( { key: self.parameters[key]} )
+        datagram[key] = self.parameters[key]
 
     # Convert to json
     self.raw = json.dumps( datagram )
     
-    # Als return the raw message
+    # Also return the raw message
     return self.raw
     
 class datagramTalk:
@@ -148,6 +148,8 @@ class datagramTalk:
 
   # Starts to serve connections until __server_term is set.
   def startServer ( self, ip, port, msg_hook ):
+   if ip == None:
+     return
 
    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    server_socket.bind( ( ip, port ) )
@@ -174,7 +176,6 @@ class datagramTalk:
           response = msg_hook( datagramTalkMessage( query ) ) # Process the request and get the response
           client_socket.send( response.toRaw() )
           client_socket.close()
-          break;
     except:
       # Something went wrong, keep going with other connections
       print "Error while serving incoming traffic."

@@ -50,7 +50,7 @@ def serve_request( request ):
  
     # Client wants to locate a node
     if request.statement == "LOC":
-     uri=request.arguments['uri']
+     uri=str(request.parameters['uri'])
      
      if nodeslocation.has_key(uri):  
        response.parameters['result'] = "OK"
