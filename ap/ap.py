@@ -50,12 +50,7 @@ def acceptRadioMessages():
 	   # Send message trough iotp2p
 	   uri = msgtokens[1]
 	   message = " ".join(msgtokens[2:])
-           dtgm = datagramTalkMessage( "" )
-           dtgm.protocol = "iotp2p.message"
-	   dtgm.protocol_version = "0.0"
-           dtgm.statement = "MSG"
-           dtgm.parameters['to'] = uri
-	   iotp2p.sendMessage( uri, dtgm )
+	   iotp2p.sendMessage( uri, message )
 	 
 ownuri = sys.argv[1]
 ownport = long(sys.argv[2],10)

@@ -17,6 +17,7 @@
 
 from nrf24 import NRF24
 import time
+import math
 from threading import Thread
 
 class iotp2pran:
@@ -32,7 +33,7 @@ class iotp2pran:
   SHUTDOWN_SIGNAL = False
 
   def __init__(self):
-   pipes = [[0x70, 0x70, 0x70, 0x70, 0x71], [0x70, 0x70, 0x70, 0x70, 0x70]]
+   pipes = [[0x10, 0x00, 0x00, 0x00, 0x00], [0x10, 0x00, 0x00, 0x00, 0x01]]
 
    # We have CE on GPIO 22 (pin 15) and IRQ on GPIO 24 (pin 18)
    self.radio.begin(0, 0, 15, 18) 
@@ -69,7 +70,7 @@ class iotp2pran:
           if c != 0 and c<128:
             recv_str += str(unichr(c))
       block, frame, slot, ta = self.getRadioTime()
-      sendMessage(str(ta))
+      self.sendMessage(str(ta))
       print("{}:{}:{}.{}".format(block, frame, slot, ta))
       return recv_str[0:-1]
 
@@ -106,8 +107,8 @@ class iotp2pran:
   def getRadioTime(self):
     current_milli_time = int(round(time.time() * 1000))
     radio_time = (current_milli_time % 60) / 100.0
-    block = int(floor(radio_time/100))
-    frame = int(floor((radio_time-block*100)/10))
+    block = int(math.floor(radio_time/100))
+    frame = int(math.floor((radio_time-block*100)/10))
     slot = radio_time % 10
-    ta = radio_time - int(floor(radio_time))
+    ta = radio_time - int(math.floor(radio_time))
     return block, frame, slot, ta

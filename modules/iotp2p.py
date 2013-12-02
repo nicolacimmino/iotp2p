@@ -31,7 +31,7 @@ class iotp2p:
       print "Attempting to register on ", server, port      
       # Register with the net
       dgtm = datagramTalkMessage( "" );
-      dgtm.protocol = "tracker";
+      dgtm.protocol = "iotp2p.tracker";
       dgtm.protocol_version = "0.0"
       dgtm.statement = "REG"
       dgtm.parameters['uri'] = uri;
@@ -47,11 +47,29 @@ class iotp2p:
         # TODO: add cache here for now we always lookup
         uid, domain = uri.split("@")
         taddress, tport = self.getBootstrapNode( domain )
-        response = self.dtg.sendMessage( taddress, tport, "LOC " + uri )
-        naddress = response.raw.split(":")[0]
-        nport = int(response.raw.split(":")[1],10)
-        return self.dtg.sendMessage( naddress, nport, "MSG " + message )
+
+        dgtm = datagramTalkMessage( "" );
+        dgtm.protocol = "iotp2p.tracker";
+        dgtm.protocol_version = "0.0"
+        dgtm.statement = "LOC"
+        dgtm.parameters['uri'] = uri;
+
+        response = self.dtg.sendDatagram( taddress, tport, "LOC " + uri )
+        print response.raw
+        naddress = response.parameters['url'].split(":")[0]
+        nport = int(response.parameters['url'].split(":")[0],10)
+
+        dgtm = datagramTalkMessage( "" );
+        dgtm.protocol = "iotp2p.message";
+        dgtm.protocol_version = "0.0"
+        dgtm.statement = "MSG"
+        dgtm.parameters['to'] = uri;
+        dgtm.parameters['message'] = message;
+
+        print naddress, nport
+        return self.dtg.sendDatagram( naddress, nport, dtgm )
       except:
+        raise
         return "NOK"
     
 

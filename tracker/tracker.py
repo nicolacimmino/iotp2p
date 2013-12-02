@@ -54,7 +54,7 @@ def serve_request( request ):
      
      if nodeslocation.has_key(uri):  
        response.parameters['result'] = "OK"
-       response.parameters['uri'] = nodeslocation[uri]
+       response.parameters['url'] = nodeslocation[uri]
      else:
        response.parameters['result'] = "NOK"
        response.parameters['reason'] = "NOTHERE"
