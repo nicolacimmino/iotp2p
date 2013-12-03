@@ -11,7 +11,7 @@
 
 DAEMON_PATH="/usr/sbin/tracker"
 
-DAEMON="python tracker.py 3000"
+DAEMON="/usr/bin/python tracker.py 3000"
 DAEMONOPTS=""
 
 NAME="tracker"

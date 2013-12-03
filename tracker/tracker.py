@@ -63,7 +63,6 @@ def serve_request( request ):
     print own_port, "<", response.raw + "\n\r"
     return response
   except:
-    raise
     response.parameters['result'] = "NOK"
     response.parameters['reason'] = "ERROR"
     return response

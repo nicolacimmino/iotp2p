@@ -35,7 +35,7 @@ class iotp2p:
       dgtm.protocol_version = "0.0"
       dgtm.statement = "REG"
       dgtm.parameters['uri'] = uri;
-      dgtm.parameters['uri'] = url;
+      dgtm.parameters['url'] = url;
       return self.dtg.sendDatagram( server, port, dgtm )
     except:
       dgtm = datagramTalkMessage( "" );
@@ -54,10 +54,10 @@ class iotp2p:
         dgtm.statement = "LOC"
         dgtm.parameters['uri'] = uri;
 
-        response = self.dtg.sendDatagram( taddress, tport, "LOC " + uri )
+        response = self.dtg.sendDatagram( taddress, tport, dgtm )
         print response.raw
         naddress = response.parameters['url'].split(":")[0]
-        nport = int(response.parameters['url'].split(":")[0],10)
+        nport = int(response.parameters['url'].split(":")[1],10)
 
         dgtm = datagramTalkMessage( "" );
         dgtm.protocol = "iotp2p.message";
@@ -67,9 +67,8 @@ class iotp2p:
         dgtm.parameters['message'] = message;
 
         print naddress, nport
-        return self.dtg.sendDatagram( naddress, nport, dtgm )
+        return self.dtg.sendDatagram( naddress, nport, dgtm )
       except:
-        raise
         return "NOK"
     
 

@@ -58,6 +58,11 @@ class datagramTalkMessage:
         
         # Give access to all parameters
         self.parameters = message_data
+      else:
+        self.protocol = ""
+        self.protocol_version = ""
+        self.statement = ""
+        self.parameters = {}
     except:
        # Something went wrong just do nothing
        print "Exception while parsing dtalk message"
@@ -179,5 +184,8 @@ class datagramTalk:
     except:
       # Something went wrong, keep going with other connections
       print "Error while serving incoming traffic."
+
+   # We are done listening close socket.
+   server_socket.close()
 
 
