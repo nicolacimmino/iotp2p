@@ -69,7 +69,6 @@ class iotp2p:
         print naddress, nport
         return self.dtg.sendDatagram( naddress, nport, dtgm )
       except:
-        raise
         return "NOK"
     
 
