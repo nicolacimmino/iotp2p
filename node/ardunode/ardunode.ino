@@ -28,8 +28,7 @@
 //  4      CSN     10
 //  5      CLK     13
 //  6      MOSI    11
-//  7      MISO    12
-//
+//  7      MISO    12//
 
 #include <SPI.h>
 #include <RF24.h>        // Copyright (C) 2011 J. Coliz <maniacbug@ymail.com>, GNU
@@ -106,6 +105,7 @@ void setup(void)
   int ix=0;
   while(ix<64)
   {
+    //EEPROM.write(EEPROM_URI+ix,"node1@nicolacimmino.com\0"[ix]);
     if(EEPROM.read(EEPROM_URI+ix)==0) break;
     uri = uri + (char)EEPROM.read(EEPROM_URI+ix);
     ix++; 
@@ -115,6 +115,7 @@ void setup(void)
   ix=0;
   while(ix<64)
   {
+    //EEPROM.write(EEPROM_URI_TO+ix,"logger@nicolacimmino.com\0"[ix]);
     if(EEPROM.read(EEPROM_URI_TO+ix)==0) break;
     uri_to = uri_to + (char)EEPROM.read(EEPROM_URI_TO+ix);
     ix++; 
