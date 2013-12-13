@@ -49,7 +49,12 @@ class datagramTalkMessage:
         print ""
         print message
         print ""
-        message_data = json.loads(message)
+		
+		# ubjson messages start with a o, json messages with a {
+		if message.startswith('o'):
+		  message_data = json.loads(simpleubjson.decode(message))
+		else:
+          message_data = json.loads(message)
         
         # iotp2p.02.0 DatagramTalk request schema mandates these params so we can just
         #    parse them and fail if they are not present.
