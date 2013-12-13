@@ -19,6 +19,7 @@ import socket
 import select
 import sys
 import json
+import simpleubjson
 
 #
 # A Datagram message conveniently split into its parts and with the 
@@ -89,7 +90,11 @@ class datagramTalkMessage:
     
     # Also return the raw message
     return self.raw
-    
+
+  # Get a uDatagramTalk encoded version of the raw DatagramTalk datagram	
+  def touRaw():
+	return simpleubjson.encode(self.toRaw())
+  
 class datagramTalk:
 
   # When set causes the listening thread to terminate.
