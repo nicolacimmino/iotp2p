@@ -49,11 +49,11 @@ class datagramTalkMessage:
         print ""
         print message
         print ""
-		
-		# ubjson messages start with a o, json messages with a {
-		if message.startswith('o'):
-		  message_data = json.loads(simpleubjson.decode(message))
-		else:
+        
+        # ubjson messages start with a o, json messages with a {
+        if message.startswith('o'):
+          message_data = json.loads(simpleubjson.decode(message))
+        else:
           message_data = json.loads(message)
         
         # iotp2p.02.0 DatagramTalk request schema mandates these params so we can just
@@ -70,35 +70,41 @@ class datagramTalkMessage:
         self.statement = ""
         self.parameters = {}
     except:
+	
+	   raise
        # Something went wrong just do nothing
        print "Exception while parsing dtalk message"
        
     # Store the raw message
     self.raw = message
   
+  # Stores the content of the datagram before encoding.
+  datagram = {}
+  
   def toRaw( self ):
     self.raw = ""
     
-    datagram = {}
-
-    datagram['protocol'] = self.protocol
-    datagram['version'] = self.protocol_version
-    datagram['statement'] = self.statement
+    self.datagram = {}
+    
+    self.datagram['protocol'] = self.protocol
+    self.datagram['version'] = self.protocol_version
+    self.datagram['statement'] = self.statement
 
     # Add all parameters, avoid eventual duplicates of the basic ones.
     for key in self.parameters.keys():
       if not key == "protocol" and not key == "version" and not key == "statement":
-        datagram[key] = self.parameters[key]
+        self.datagram[key] = self.parameters[key]
 
     # Convert to json
-    self.raw = json.dumps( datagram )
+    self.raw = json.dumps( self.datagram )
     
     # Also return the raw message
     return self.raw
 
-  # Get a uDatagramTalk encoded version of the raw DatagramTalk datagram	
-  def touRaw():
-	return simpleubjson.encode(self.toRaw())
+  # Get a uDatagramTalk encoded version of the raw DatagramTalk datagram    
+  def touRaw(self):
+    self.toRaw()
+    return simpleubjson.encode(self.datagram)
   
 class datagramTalk:
 
