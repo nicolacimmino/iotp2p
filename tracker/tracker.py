@@ -22,20 +22,82 @@ import socket
 import shelve
 import select
 import atexit
+import json
+from flask import Flask
+from flask import request
 from datagramtalk import datagramTalk
 from datagramtalk import datagramTalkMessage
+from threading import Thread
 
+# HTTP ReSTful API for tracker monitoring
+app = Flask(__name__)
+
+# Teacker operations statistics
+reg_count = 0
+loc_count = 0
+err_count = 0
+
+# Resource: /
+# Contains a list of available resources
+@app.route("/")
+def _res_resources():
+
+  res = [ 'stats', 'nodes' ]
+  response = {}
+  response['resources'] = res
+
+  # Convert to json
+  return json.dumps( response )
+
+# Resource: stats
+# Contains statistical information about tracker operation
+@app.route("/stats")
+def _res_stats():
+  global reg_count
+  global loc_count
+  global err_count
+
+  stats = {}
+  stats['reg_count'] = reg_count
+  stats['loc_count'] = loc_count
+  stats['err_count'] = err_count
+
+  # Convert to json
+  return json.dumps( stats )
+
+# Contains all registered nodes and their URLs
+@app.route("/nodes")
+def _res_nodes():
+  global nodeslocation
+
+  nodes = {}
+  for node in nodeslocation:
+    nodes[node] = nodeslocation[node]
+
+  # Convert to json
+  return json.dumps( nodes )
+
+def startFlaskServer():
+    app.run( host = "0.0.0.0", debug = False )
+
+if __name__ == "__main__":
+    thread = Thread( target = startFlaskServer  )
+    thread.start()
 
 def serve_request( request ):
- 
+  global reg_count
+  global loc_count
+  global err_count
+
   try:
     #print own_port, ">", request.raw + "\r"
     response = datagramTalkMessage( "" )
     response.protocol = "iotp2p.track"
     response.protocol_version = "0.0"
-    
+
     # Client wants to register with the tracker
     if request.statement == "REG":
+     reg_count = reg_count + 1
      uri=request.parameters['uri']
      url=request.parameters['url']   
      
@@ -47,9 +109,11 @@ def serve_request( request ):
        nodeslocation[str(uri)]=url
        nodeslocation.sync()
        response.parameters['result'] = "OK"
- 
+     return response
+
     # Client wants to locate a node
     if request.statement == "LOC":
+     loc_count = loc_count + 1
      uri=str(request.parameters['uri'])
      
      if nodeslocation.has_key(uri):  
@@ -58,17 +122,21 @@ def serve_request( request ):
      else:
        response.parameters['result'] = "NOK"
        response.parameters['reason'] = "NOTHERE"
-       
+     return response  
 
-    print own_port, "<", response.raw + "\n\r"
+    response.parameters['result'] = "NOK"
+    response.parameters['reason'] = "UNKNOWN"
     return response
   except:
+    err_count = err_count + 1
     response.parameters['result'] = "NOK"
     response.parameters['reason'] = "ERROR"
     return response
 	
-def stop_dts():
+def stop_tracker():
     dts.stopListening()
+    func = request.environ.get('werkzeug.server.shutdown')
+    func()
 	
 # Expect the first parameter to be the port to listen to
 if len(sys.argv) != 2:
@@ -80,11 +148,13 @@ own_port = long(sys.argv[1],10)
 # Open the cache of nodes location
 nodeslocation = shelve.open("data/nodes_location_" + str( own_port ) )
 
+print _res_nodes()
+
 # Initialize the server.
 dts = datagramTalk('', own_port, serve_request )
 
 # Make sure we always stop listening even if we get killed.  
-atexit.register( stop_dts )
+atexit.register( stop_tracker )
 
 # Wait here for user to want to exit.
 raw_input( "Press enter to stop...." )

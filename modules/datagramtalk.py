@@ -112,11 +112,10 @@ class datagramTalk:
 
   # This constructor initializes the server and listens for messages.
   def __init__( self, ip, port, msg_hook ):
-   
     # Start a thread listeining for incoming messages.
     thread = Thread( target = self.startServer, args = ( ip, port, msg_hook ) )
     thread.start()
-  
+
   # Stop listening for incoming commands.
   def stopListening( self ):
     self.__server_term = True
