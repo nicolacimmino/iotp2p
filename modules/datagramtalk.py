@@ -70,9 +70,7 @@ class datagramTalkMessage:
         self.statement = ""
         self.parameters = {}
     except:
-	
-	   raise
-       # Something went wrong just do nothing
+	   # Something went wrong just do nothing
        print "Exception while parsing dtalk message"
        
     # Store the raw message
