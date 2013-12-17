@@ -20,46 +20,26 @@ import atexit
 import json
 from flask import Flask
 from flask import request
-from datagramtalk import datagramTalk
-from datagramtalk import datagramTalkMessage
 from threading import Thread
 from iotp2p import iotp2p
 
-# HTTP ReSTful API for tracker monitoring
+# HTTP ReSTful API for the HTTP gateway
 app = Flask(__name__)
 
-# Resource: /
-# Contains a list of available resources
-@app.route("/")
-def _res_resources():
-
-  res = [ 'node' ]
-  response = {}
-  response['resources'] = res
-
-  # Convert to json
-  return json.dumps( response )
-
-# Resource: /test/sender
+# Resource: /tests/senderforms/<uri>
 # Contains a test form that can be used to send a message to the specified URI
 # Not really for production good now for proof of concept testing.
-@app.route("/test/senderform/<uri>")
+@app.route("/tests/senderforms/<uri>")
 def _res_resources_test_sender(uri):
-  return "<form method='POST' action='/node/" + uri + "'>Message:<input type='text' name='message'><input type='submit'></form>"
+  return "<form method='POST' action='/nodes/" + uri + "/messages'>Message:<input type='text' name='message'><input type='submit'></form>"
 
-# Resource: /node/<node_id> POST
+# Resource: /nodes/<uri>/messages POST
 # Sends a message to the specified URI
-@app.route("/node/<uri>", methods=['POST'])
-def _res_resource_node(uri):
+@app.route("/nodes/<uri>/messages", methods=['POST'])
+def _res_resource_node(uri):  
     message = request.form['message']
     iotp2p.sendMessage( uri, message )
-
-    res = [ 'ok' ]
-    response = {}
-    response['status'] = res
-
-    # Convert to json
-    return json.dumps( response )
+    return ""
 	
 # iotp2p protocol library
 iotp2p = iotp2p()
