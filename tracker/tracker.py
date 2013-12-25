@@ -99,16 +99,24 @@ def serve_request( request ):
     if request.statement == "REG":
      reg_count = reg_count + 1
      uri=request.parameters['uri']
-     url=request.parameters['url']   
+     url=request.parameters['url']
      
      if not uri == "" and not url == "":
-       # TODO: here we need to get the VCode and verify the MAC
-       # against the stored secret for this node.
-     
-       # Cache the URL of this URI
-       nodeslocation[str(uri)]=url
-       nodeslocation.sync()
-       response.parameters['result'] = "OK"
+       # TODO provide method to store secrets, this is just a test.
+       nodessecrets[uri] = "this is a test secret" 
+       vc_nonce=request.parameters['vc_nonce']
+       vc_hmac=request.parameters['vc_hmac']
+       key=nodessecrets[uri];
+       
+       # Fail the request is the HMAC is invalid.
+       if(validateStatement(key, request)):
+         # Cache the URL of this URI
+         nodeslocation[str(uri)]=url
+         nodeslocation.sync()
+         response.parameters['result'] = "OK"
+       else
+         response.parameters['result'] = "NOK"
+       
      return response
 
     # Client wants to locate a node
@@ -146,7 +154,9 @@ if len(sys.argv) != 2:
 own_port = long(sys.argv[1],10)
 
 # Open the cache of nodes location
-nodeslocation = shelve.open("data/nodes_location_" + str( own_port ) )
+nodeslocation = shelve.open("data/nodes_location_" + str( own_port ))
+
+nodessecrets = shelve.open("data/nodes_secrets_" + str( own_port ))
 
 print _res_nodes()
 
