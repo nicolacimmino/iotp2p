@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Rel.0 implementation of a iotp2p tracker. Rel.0 of iotp2p supports
-#    single trackers that serve a single domain. There is no trackers
+#    single trackers to serve a single domain. There is no trackers
 #    swarming at this stage.
 #   Copyright (C) 2013 Nicola Cimmino
 #
@@ -156,6 +156,7 @@ own_port = long(sys.argv[1],10)
 # Open the cache of nodes location
 nodeslocation = shelve.open("data/nodes_location_" + str( own_port ))
 
+# Open the cache of secrets
 nodessecrets = shelve.open("data/nodes_secrets_" + str( own_port ))
 
 print _res_nodes()
