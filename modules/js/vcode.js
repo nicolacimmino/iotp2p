@@ -15,7 +15,7 @@
 //    along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-function generateHMAC(key, nonce, rawdata)
+function generateHMAC(key, rawdata)
 {
   var shaObj = new jsSHA(rawdata, 'TEXT');
   return shaObj.getHMAC(key, "B64", "SHA-256", "B64");
@@ -23,7 +23,7 @@ function generateHMAC(key, nonce, rawdata)
 	
 function getVCode(key, nonce, rawdata)
 {
-  var hmac = generateHMAC(key, nonce, rawdata);
+  var hmac = generateHMAC(key, rawdata);
   return {"vc_version":0, "vc_nonce": nonce, "vc_hmac":hmac};
 }
  
@@ -37,7 +37,7 @@ function validateStatement(key, statement)
     if(!key.startsWith("."))
        rawdata = rawdata + key + "=" + statement[key] + "|";
        
-  var hmac = generateHMAC(key, statement['vc_nonce'], rawdata);
+  var hmac = generateHMAC(key, rawdata);
    
   return hmac == statement['.hmac'];
 }
