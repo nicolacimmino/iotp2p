@@ -18,13 +18,13 @@
 function generateHMAC(key, nonce, rawdata)
 {
   var shaObj = new jsSHA(rawdata, 'TEXT');
-  return shaObj.getHMAC(key, "B64", "SHA-256", "B64"))
+  return shaObj.getHMAC(key, "B64", "SHA-256", "B64");
 }
 	
 function getVCode(key, nonce, rawdata)
 {
-  var hmac = generateHMAC(key, nonce, rawdata)
-  return {"vc_version":0, "vc_nonce": nonce, "vc_hmac":hmac}
+  var hmac = generateHMAC(key, nonce, rawdata);
+  return {"vc_version":0, "vc_nonce": nonce, "vc_hmac":hmac};
 }
  
 function validateStatement(key, statement)
@@ -34,10 +34,10 @@ function validateStatement(key, statement)
   //  prefixed by a ".".
   var rawdata=""
   for(var key in statement)
-    if not key.startsWith(".")
-       rawdata = rawdata + key + "=" + statement[key] + "|"
+    if(!key.startsWith("."))
+       rawdata = rawdata + key + "=" + statement[key] + "|";
        
-  var hmac = generateHMAC(key, statement['vc_nonce'], rawdata)
+  var hmac = generateHMAC(key, statement['vc_nonce'], rawdata);
    
-  return hmac == statement['.hmac']
+  return hmac == statement['.hmac'];
 }
