@@ -1,3 +1,18 @@
+# iotp2p provides implementation of iotp2p primitive functiions.
+#   Copyright (C) 2013 Nicola Cimmino
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see http://www.gnu.org/licenses/.
 
 import dns.resolver # http://www.dnspython.org
 from datagramtalk import datagramTalk
@@ -9,25 +24,31 @@ class iotp2p:
   dtg = datagramTalk( None, None, None )
 
   #
-  # Attempts to get a boostrap node for the given domain.
-  def getBootstrapNode(self, domain ):
+  # Attempts to find the tracker for the given domain.
+  # Implements iotp2p.00.3 URI and URLs.
+  def getTracker(self, domain ):
     try:
+      # Try to get the SRV record for this domain.
       answers = dns.resolver.query('_iot._tcp.' + domain, 'SRV')
+      
+      # If we get an answer we attempt parsing it, else we default to domain:3333
       if len( answers ) > 0:
+        # Record looks like:
+        # _iot._tcp.example.com. 3600 IN    SRV     0 80 3000 192.0.2.1.
         return str(answers[0]).split(' ')[3][0:-1],  int(str(answers[0]).split(' ')[2],10)
       else:
-        # User default 3333 port if no SRV record is found.
         return domain, 3333
     except:
-        # User default 3333 port if no SRV record is found.
+        # Something went wrong, we must assume domain:3333 according to iotp2p.00.3.
         return domain, 3333
  
-  
+  # Register a node on a tracker.
+  # Implements iotp2p.02.3 Trackers Interface
   def registerNode(self, uri, url ):
     try:
       uid, domain = uri.split( "@" )
-      # Find a bootstrap node for the tracker net      
-      server, port = self.getBootstrapNode( domain )
+      # Find a tracker for this domain.      
+      server, port = self.getTracker( domain )
       print "Attempting to register on ", server, port      
       # Register with the net
       dgtm = datagramTalkMessage( "" );
@@ -46,8 +67,10 @@ class iotp2p:
       try:
         # TODO: add cache here for now we always lookup
         uid, domain = uri.split("@")
-        taddress, tport = self.getBootstrapNode( domain )
+        taddress, tport = self.getTracker( domain )
 
+        # TODO: move to own function as other callers will need
+        #  to do LOC.
         dgtm = datagramTalkMessage( "" );
         dgtm.protocol = "iotp2p.tracker";
         dgtm.protocol_version = "0.0"
