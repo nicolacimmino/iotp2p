@@ -19,25 +19,28 @@ from hashlib import sha256
 import hmac
 import binascii
 
-def generateHMAC(key, nonce, rawdata):
-
-  hashed = hmac.new(key, str(nonce) + rawdata, sha256)
-  return binascii.b2a_base64(hashed.digest())[:-1]
-	
-def getVCode(key, nonce, rawdata):
-  hmac = generateHMAC(key, nonce, rawdata)
-  return {"vc_version":0, "vc_nonce": nonce, "vc_hmac":hmac}
-  
-def validateStatement(key, statement):
+def generateHMAC(key, statement):
   # The rawdata is a concatenation of all parameters
   #  names and values excluding parameters with names 
   #  prefixed by a ".".
   rawdata=""
-  for key in statement.keys():
-    if not key[0] == ".":
-       rawdata = rawdata + key + "=" + statement[key] + "|"
-       
-  hmac = generateHMAC(key, statement['vc_nonce'], rawdata)
+  datagram_params = sorted(statement.datagram)
+  for datagram_param in datagram_params:
+    if not datagram_param[0] == ".":
+       rawdata = rawdata + datagram_param + "=" + statement.datagram[datagram_param] + "|"
+  
+  print rawdata
+  
+  hashed = hmac.new(binascii.a2b_base64(key), rawdata, sha256)
+  return binascii.b2a_base64(hashed.digest())[:-1]
+  
+def getVCode(key, nonce, rawdata):
+  hmac = generateHMAC(key, rawdata)
+  return {"vc_version":0, "vc_nonce": nonce, "vc_hmac":hmac}
+  
+def validateStatement(key, statement):
+     
+  hmac = generateHMAC(key, rawdata)
   
   print "Raw data:" + rawdata
   print "HMAC:" + hmac

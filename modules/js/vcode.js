@@ -15,9 +15,32 @@
 //    along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-function generateHMAC(key, rawdata)
+function generateHMAC(key, statement)
 {
-  var shaObj = new jsSHA(rawdata, 'TEXT');
+  // The rawdata is a concatenation of all parameters
+  //  names and values excluding parameters with names 
+  //  prefixed by a ".".
+  
+  // Sort alphabetically the keys
+  var sortedParams = [];
+  for(var param in statement) {
+    sortedParams[sortedParams.length] = param;
+  }
+  sortedParams.sort();
+  
+  var rawdata="";
+  for(var ix=0; ix<sortedParams.length; ix++)
+  {
+    param = String(sortedParams[ix]);
+    if(param.indexOf(".") != 0)
+	{
+       rawdata = rawdata + param + "=" + String(statement[param]) + "|";
+    }
+  }	
+  
+  alert(key);
+  
+  var shaObj = new jsSHA(rawdata, "TEXT");
   return shaObj.getHMAC(key, "B64", "SHA-256", "B64");
 }
 	
@@ -29,15 +52,7 @@ function getVCode(key, nonce, rawdata)
  
 function validateStatement(key, statement)
 {
-  // The rawdata is a concatenation of all parameters
-  //  names and values excluding parameters with names 
-  //  prefixed by a ".".
-  var rawdata=""
-  for(var key in statement)
-    if(!key.startsWith("."))
-       rawdata = rawdata + key + "=" + statement[key] + "|";
-       
-  var hmac = generateHMAC(key, rawdata);
+  var hmac = generateHMAC(key, statement);
    
   return hmac == statement['.hmac'];
 }
