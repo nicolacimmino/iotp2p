@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">iotp2p Control Point</string>
+    <string name="iotp2p_title">iotp2p</string>
+    <string name="iotp2p_switch">Test LED</string>
+    <string name="action_settings">Settings</string>
+
+</resources>
