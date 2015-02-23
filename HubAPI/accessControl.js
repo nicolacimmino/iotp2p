@@ -1,7 +1,7 @@
 /* accessControl.js is part of IotHub API and is responsible to
  ~      provide access control for API requests.
  *
- *   Copyright (C) 2014 Nicola Cimmino
+ *   Copyright (C) 2015 Nicola Cimmino
  *
  *    This program is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
@@ -53,13 +53,13 @@ module.exports.getAdminKey  = function (username, password, onAllowed, onDenied)
                 dbMongo.collection('auth_tokens').insert(
                     {
                     'username':username,
-                    'auth_token': buf.toString('hex') 
+                    'adminKey': buf.toString('hex') 
                     },
                     function(err, doc) {
                       if(err) {
                         onDenied();
                       } else {
-                        onAllowed({auth_token: buf.toString('hex')});
+                        onAllowed({adminKey: buf.toString('hex')});
                       }
                     });
                 });
@@ -75,65 +75,48 @@ module.exports.getAdminKey  = function (username, password, onAllowed, onDenied)
       });
 };  
 
-// NOTE: The methods below allow to authorize each of the four CRUD operation separately. We don't
-//  have yet ACLs in place so they all have the same implementation at the moment. In other words
-//  a valid token allows all CRUD operations. Defining the functions now though allows to freeze
-//  the interface so we don't have to change the rest of the code when ACLs are in place.
-
-// TODO add method to authorize admin request
-
-// Checks if the supplied token allows create operations on a resource owned by username.
+// Checks if the supplied message has been signed with the createKey.
 // Takes two callback function that are called in case of operation permitted or denied respectively.
-module.exports.authorizeCreate = function (username, auth_token, onAllowed, onDenied) {
-
-    // TODO
-    // change to take message data, HMAC, username as params
-    // Try to finnd adminKey in redis
-    // if not found search from db
-    // generate HMAC
-    // comapare safely HMAC
-       
-    dbMongo.collection('auth_tokens').find({auth_token:auth_token, username:username} , function(e, docs) {
-      if(docs.length === 1) {
-        onAllowed();
-      } else {
-        onDenied();
-      }
-    }); 
+module.exports.authorizeCreate = function (username, message, hmac, onAllowed, onDenied) {
+    // Find in redis if adminKey for this user is cached
+    // Get adminKey from database if needed
+    // verifyHMAC(...)
 };
 
-// Checks if the supplied token allows read operations on a resource owned by username.
+// Checks if the supplied message has been signed with the readKey.
 // Takes two callback function that are called in case of operation permitted or denied respectively.
-module.exports.authorizeRead = function (username, auth_token, onAllowed, onDenied) {
-    dbMongo.collection('auth_tokens').find({auth_token:auth_token, username:username} , function(e, docs) {
-      if(docs.length === 1) {
-        onAllowed();
-      } else {
-        onDenied();
-      }
-    }); 
+module.exports.authorizeRead = function (username, message, hmac, onAllowed, onDenied) {
+    // Find in redis if adminKey for this user is cached
+    // Get adminKey from database if needed
+    // verifyHMAC(...)
 };
 
-// Checks if the supplied token allows update operations on a resource owned by username.
+// Checks if the supplied message has been signed with the updateKey.
 // Takes two callback function that are called in case of operation permitted or denied respectively.
-module.exports.authorizeUpdate = function (username, auth_token, onAllowed, onDenied) {
-    dbMongo.collection('auth_tokens').find({auth_token:auth_token, username:username} , function(e, docs) {
-      if(docs.length === 1) {
-        onAllowed();
-      } else {
-        onDenied();
-      }
-    }); 
+module.exports.authorizeUpdate = function (username, message, hmac, onAllowed, onDenied) {
+    // Find in redis if adminKey for this user is cached
+    // Get adminKey from database if needed
+    // verifyHMAC(...)
 };
 
-// Checks if the supplied token allows delete operations on a resource owned by username.
+// Checks if the supplied message has been signed with the deleteKey.
 // Takes two callback function that are called in case of operation permitted or denied respectively.
-module.exports.authorizeDelete = function (username, auth_token, onAllowed, onDenied) {
-    dbMongo.collection('auth_tokens').find({auth_token:auth_token, username:username} , function(e, docs) {
-      if(docs.length === 1) {
-        onAllowed();
-      } else {
-        onDenied();
-      }
-    }); 
+module.exports.authorizeDelete = function (username, message, hmac, onAllowed, onDenied) {
+    // Find in redis if adminKey for this user is cached
+    // Get adminKey from database if needed
+    // verifyHMAC(...)
+};
+
+// Checks if the supplied message has been signed with the adminKey.
+// Takes two callback function that are called in case of operation permitted or denied respectively.
+module.exports.authorizeAdmin = function (username, message, hmac, onAllowed, onDenied) {
+    // Find in redis if adminKey for this user is cached
+    // Get adminKey from database if needed
+    // verifyHMAC(...)
+};
+
+function verifyHMAC(message, key, rolling_code, hmac)
+{
+  // Generate HMAC and compare safely to supplied hmac. 
+  // return true/false
 };
