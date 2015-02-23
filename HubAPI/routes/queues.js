@@ -80,20 +80,22 @@ router.get('/:username/:id', function(req, res) {
       });
 });
 
-/* HTTP POST /queues/:username?mac=mac
+/* HTTP POST /queues/:username/:queueId?mac=mac
  * Param username: the username of the user owning the queue.
+ * Param id: the id of the queue.
  * Query param mac: a valid MAC generated with a createKey
  * POST data: a json document describing the transaction
  * Returns: 200 on success.
  * Error: 401 if the MAC doesn't authorize the operation.
  */
-router.post('/:username', function(req, res) {
+router.post('/:username/:queueId', function(req, res) {
 
   var db = req.db;
   var username = req.params.username;
+  var queueId = req.params.queueId;
   var mac =  req.query.mac;
   
-  accessControl.authorizeCreate(username, macmac, 
+  accessControl.authorizeCreate(username, mac, 
       function onAllowed() {
         try {
           // We take the documents as it came in the body as base for the trasaction
@@ -103,11 +105,11 @@ router.post('/:username', function(req, res) {
           // Sanitize (e.g. if some fields are needed from the system prevent them to leak in (blacklisting)
           // or if a more structured document is desired allow only certain values in the doc (whitelist)).
           // One more option is to make the whole document a value inside a document that represents the transaction
-          // (e.g. id, username and document) so application is isolated from the values.
-          transaction.username = req.params.username;
+          // (e.g. id, username, queue and document) so application is isolated from the values.
+          transaction.username = username;
+          transaction.queueId = queueId;
           
           db.collection('transactions').insert(transaction,{}, function(e,docs){
-            gcmService.notifyUserMobiles(db,username, reporter_gcm_reg_id);
             res.send(200);
           });
         } catch (Exception) {
