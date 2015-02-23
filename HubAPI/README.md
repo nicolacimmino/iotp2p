@@ -1,7 +1,7 @@
 API
 ==================
 
-This API allows to access expense data on the IoTHub.
+This API allows to access data on the IoTHub.
 
 The table below is a summary of the API resources and operations.
 
